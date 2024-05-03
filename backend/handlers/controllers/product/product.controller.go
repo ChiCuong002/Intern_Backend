@@ -163,6 +163,7 @@ func AddProduct(c echo.Context) error {
 		"product": product,
 	})
 }
+
 func DetailProduct(c echo.Context) error {
 	productID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -181,6 +182,7 @@ func DetailProduct(c echo.Context) error {
 		"product": product,
 	})
 }
+
 func UpdateProduct(c echo.Context) error {
 	userID := c.Get("userID").(uint)
 	id, err := strconv.Atoi(c.Param("id"))
@@ -391,4 +393,21 @@ func PurchaseProductController(db *gorm.DB) echo.HandlerFunc {
 		// Return success response
 		return c.JSON(http.StatusOK, echo.Map{"message": "Purchase successful"})
 	}
+}
+func DeleteProduct(c echo.Context) error {
+	productID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"message": "Failed to get product id",
+		})
+	}
+	err = service.DeleteProduct(uint(productID), c.Get("userID").(uint))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "Xóa bài đăng thành công",
+	})
 }

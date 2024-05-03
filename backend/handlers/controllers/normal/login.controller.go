@@ -17,9 +17,11 @@ import (
 )
 
 const (
+	INFINITY      = 1000000
 	LIMIT_DEFAULT = 10
 	PAGE_DEFAULT  = 1
 	SORT_DEFAULT  = " product_id desc"
+	FILTER_DEFAULT = 0
 )
 
 func sortString(sort string) string {
@@ -166,12 +168,18 @@ func HomePage(c echo.Context) error {
 		sort = SORT_DEFAULT
 	}
 	search := c.QueryParam("search")
+	filter, err := strconv.Atoi(c.QueryParam("filter"))
+	if err != nil {
+		filter = FILTER_DEFAULT
+	}
 	pagination := paginationHelper.Pagination{
 		Page:   page,
 		Limit:  limit,
 		Sort:   sort,
 		Search: search,
+		Filter: filter,
 	}
+
 	products, err := services.GetHomePageProduct(pagination)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{

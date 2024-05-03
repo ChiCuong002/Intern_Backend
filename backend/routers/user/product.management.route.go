@@ -24,4 +24,6 @@ func ProductManagementRoutes(router *echo.Group) {
 	router.PATCH("/deactive-product/:id", controllers.DeActiveProduct)
 	//unblock product
 	router.PATCH("/active-product/:id", controllers.ActiveProduct)
+	//delete product
+	router.PATCH("/delete-product/:id", controllers.DeleteProduct)
 }

@@ -38,7 +38,7 @@ func GetDB() *gorm.DB {
 	return db
 }
 func Migration() {
-	db.AutoMigrate(&schema.Role{}, &schema.User{}, &schema.Category{}, &schema.Status{}, &schema.Product{}, &schema.ProductImage{}, &schema.Image{}, &schema.Order{})
+	db.AutoMigrate(&schema.Role{}, &schema.User{}, &schema.TransactionHash{}, &schema.Category{}, &schema.Status{}, &schema.Product{}, &schema.ProductImage{}, &schema.Image{}, &schema.Order{})
 }
 func DropColumns(tableName string, columnName string) {
 	err := db.Migrator().DropColumn(tableName, columnName)

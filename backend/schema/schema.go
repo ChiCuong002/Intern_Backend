@@ -15,20 +15,26 @@ type Role struct {
 	Users []User `gorm:"foreignKey:RoleID"`
 }
 type User struct {
-	UserID      uint      `json:"user_id" gorm:"primaryKey;autoIncrement"`
-	RoleID      uint      `json:"role_id"`
-	FirstName   string    `json:"first_name" form:"FirstName"`
-	LastName    string    `json:"last_name" form:"LastName"`
-	Address     string    `json:"address" form:"Address"`
-	Email       string    `json:"email" form:"Email"`
-	PhoneNumber string    `json:"phone_number" form:"PhoneNumber"`
-	Password    string    `json:"password" form:"Password"`
-	Balance     float64   `json:"balance" gorm:"default:10000"`
-	IsActive    bool      `json:"is_active" gorm:"default:true"`
-	Products    []Product `json:"products" gorm:"foreignKey:UserID"`
-	Orders      []Order   `json:"orders" gorm:"foreignKey:UserID"`
-	ImageID     uint      `json:"-" gorm:"foreignKey:ImageID"`
-	Image       Image     `json:"image"`
+	UserID           uint              `json:"user_id" gorm:"primaryKey;autoIncrement"`
+	RoleID           uint              `json:"role_id"`
+	FirstName        string            `json:"first_name" form:"FirstName"`
+	LastName         string            `json:"last_name" form:"LastName"`
+	Address          string            `json:"address" form:"Address"`
+	Email            string            `json:"email" form:"Email"`
+	PhoneNumber      string            `json:"phone_number" form:"PhoneNumber"`
+	Password         string            `json:"password" form:"Password"`
+	Balance          float64           `json:"balance" gorm:"default:10000"`
+	IsActive         bool              `json:"is_active" gorm:"default:true"`
+	Products         []Product         `json:"products" gorm:"foreignKey:UserID"`
+	Orders           []Order           `json:"orders" gorm:"foreignKey:UserID"`
+	TransactionSends []TransactionHash `json:"transaction_sended" gorm:"foreignKey:UserID"`
+	ImageID          uint              `json:"-" gorm:"foreignKey:ImageID"`
+	Image            Image             `json:"image"`
+}
+type TransactionHash struct {
+	TransactionID   string    `gorm:"primaryKey" json:"transaction_hash"`
+	UserID          uint      `gorm:"foreignKey:UserID" json:"user_id"`
+	TransactionDate time.Time `gorm:"type:timestamp" json:"transaction_date"`
 }
 type Category struct {
 	CategoryID   uint `gorm:"primaryKey;autoIncrement"`
@@ -60,9 +66,9 @@ type ProductImage struct {
 	Image          Image
 }
 type Image struct {
-	ImageID   uint `gorm:"primaryKey;autoIncrement"`
-	BucketKey string
-	Path      string
+	ImageID   uint   `gorm:"primaryKey;autoIncrement" json:"image_id"`
+	BucketKey string `json:"bucket_key"`
+	Path      string `json:"path"`
 }
 type Order struct {
 	OrderID     uint `gorm:"primaryKey;autoIncrement"`

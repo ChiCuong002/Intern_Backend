@@ -1,6 +1,7 @@
 package normalRoute
 
 import (
+	chainControllers "main/handlers/controllers/chain"
 	controllers "main/handlers/controllers/normal"
 	productControllers "main/handlers/controllers/product"
 
@@ -18,4 +19,9 @@ func InitNormalRouters(app *echo.Echo) {
 	app.GET("/homepage", controllers.HomePage)
 	//detail product
 	app.GET("/product/:id", productControllers.DetailProduct)
+	//block chain account balances
+	app.GET("/account-balances", chainControllers.AccountBalance)
+	
+	//fetchtx
+	app.GET("/fetchtx", chainControllers.FetchTxByHash)
 }

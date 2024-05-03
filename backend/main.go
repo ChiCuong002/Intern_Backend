@@ -12,7 +12,7 @@ import (
 func main() {
 	app := echo.New()
 	storage.InitDB()
-	//storage.Migration()
+	storage.Migration()
 	app.Use(gomiddleware.Logger())
 	app.Use(gomiddleware.CORSWithConfig(configs.CORSConfig()))
 	routers.Routers(app)

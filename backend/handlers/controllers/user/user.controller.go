@@ -299,6 +299,7 @@ func AddBalanceAllUser(c echo.Context) error {
 		"message": "Add balance for all user successfully",
 	})
 }
+
 func MyProfile(c echo.Context) error {
 	idInt := c.Get("userID").(uint)
 	fmt.Println("id: ", idInt)

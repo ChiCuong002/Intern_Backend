@@ -19,7 +19,8 @@ func Login(username, password string) (schema.User, string, error) {
 	var user schema.User
 	db := storage.GetDB()
 	//check phone number in db
-	result := db.Where("phone_number = ?", username).First(&user)
+	result := db.Where("phone_number = ?", username).Preload("Image").First(&user)
+
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return schema.User{}, "", fmt.Errorf("user not registered: %v", result.Error)
 	}
@@ -68,7 +69,10 @@ func GetHomePageProduct(pagination paginationHelper.Pagination) (*paginationHelp
 	db := storage.GetDB()
 	products := []productHelper.DetailProductRes{}
 	query := db.Model(&products).Where("status_id = 1")
-	query = query.Preload("User").Preload("Category").Preload("Status").Preload("ProductImages.Image")
+	if pagination.Filter != 0 {
+		query = query.Where("category_id = ?", pagination.Filter)
+	}
+	query = query.Preload("User").Preload("User.Image").Preload("Category").Preload("Status").Preload("ProductImages.Image")
 	query = SearchProducts(query, pagination.Search)
 	query = query.Scopes(scope.Paginate(query, &pagination))
 	query.Find(&products)

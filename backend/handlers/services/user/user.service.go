@@ -7,7 +7,6 @@ import (
 	helper "main/helper/struct"
 	"main/models"
 	"main/schema"
-
 	"gorm.io/gorm"
 )
 
@@ -122,5 +121,13 @@ func AddBalanceAllUser(tx *gorm.DB, req helper.Gif) error {
 	// Commit transaction
 	tx.Commit()
 
+	return nil
+}
+func InsertTransactionHash(req schema.TransactionHash) error {
+	db := storage.GetDB()
+	result := db.Create(&req)
+	if result.Error != nil {
+		return fmt.Errorf(result.Error.Error())
+	}
 	return nil
 }

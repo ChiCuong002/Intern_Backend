@@ -22,6 +22,7 @@ import (
 const (
 	STATUS_ACTIVE   uint = 1
 	STATUS_INACTIVE uint = 2
+	STATUS_DELETED  uint = 3
 )
 
 func InsertProduct(tx *gorm.DB, product *helper.ProductInsert) error {
@@ -82,7 +83,7 @@ func DetailProduct(id uint) (productHelper.DetailProductRes, error) {
 	if err != nil {
 		return product, err
 	}
-	product.User = &user
+	product.User = user
 
 	// Load Category
 	var category productHelper.Category
@@ -121,11 +122,11 @@ func GetAllProduct(pagination paginationHelper.Pagination) (*paginationHelper.Pa
 func GetMyInventory(pagination paginationHelper.Pagination, userID uint) (*paginationHelper.Pagination, error) {
 	db := storage.GetDB()
 	products := []productHelper.DetailProductRes{}
-	query := db.Model(&products).Where("user_id = ?", userID)
+	query := db.Model(&products).Where("user_id = ? and status_id != 3", userID)
 	fmt.Printf("query: %+v\n", query)
 	query = SearchProducts(query, pagination.Search)
 	query = query.Scopes(scope.Paginate(query, &pagination))
-	query.Preload("ProductImages.Image").Preload("User").Preload("Category").Preload("Status").Find(&products)
+	query.Preload("ProductImages.Image").Preload("User").Preload("User.Image").Preload("Category").Preload("Status").Find(&products)
 	pagination.Rows = products
 	return &pagination, nil
 }
@@ -136,7 +137,7 @@ func GetMyProduct(pagination paginationHelper.Pagination, userID uint) (*paginat
 	fmt.Printf("query: %+v\n", query)
 	query = SearchProducts(query, pagination.Search)
 	query = query.Scopes(scope.Paginate(query, &pagination))
-	query.Preload("ProductImages.Image").Preload("User").Preload("Category").Preload("Status").Where(&schema.Product{UserID: userID, StatusID: STATUS_ACTIVE}).Find(&products)
+	query.Preload("ProductImages.Image").Preload("User").Preload("User.Image").Preload("Category").Preload("Status").Where(&schema.Product{UserID: userID, StatusID: STATUS_ACTIVE}).Find(&products)
 	pagination.Rows = products
 	return &pagination, nil
 }
@@ -194,14 +195,27 @@ func ActiveProduct(id uint, userID uint) error {
 	}
 	return nil
 }
+func DeleteProduct(id uint, userID uint) error {
+	db := storage.GetDB()
+	product := helper.DetailProductRes{}
+	result := db.Model(&product).First(&product, "product_id = ?", id)
+	if result.Error != nil {
+		return fmt.Errorf("falied to get product. %s", result.Error.Error())
+	}
+	if product.UserID != userID {
+		return fmt.Errorf("you are not the owner of this product")
+	}
+	product.StatusID = STATUS_DELETED
+	result = db.Model(&product).Where("product_id", product.ProductID).Update("status_id", product.StatusID)
+	if result.Error != nil {
+		return fmt.Errorf(result.Error.Error())
+	}
+	return nil
+}
 func PurchaseProduct(db *gorm.DB, c echo.Context, userID, productID uint) error {
 	var user schema.User
 	var product schema.Product
 	var seller schema.User
-
-	// if userID == productID {
-	// 	return errors.New("bạn không thể mua sản phẩm của chính bạn")
-	// }
 
 	if err := db.First(&user, userID).Error; err != nil {
 		return err

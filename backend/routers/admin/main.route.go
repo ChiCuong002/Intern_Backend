@@ -20,4 +20,6 @@ func InitAdminRoute(app *echo.Echo) {
 	CategoriesManagementRouters(group)
 	//product management routers
 	ProductManagementRoutes(group)
+	//
+	TransactionManagementRoute(group)
 }

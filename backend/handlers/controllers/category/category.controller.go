@@ -86,11 +86,6 @@ type AddCategoryRequest struct {
 
 func AddCategory(c echo.Context) error {
 	var addCategoryRequest AddCategoryRequest
-	// if addCategoryRequest.NameCategory == "" {
-	// 	return c.JSON(http.StatusBadRequest, echo.Map{
-	// 		"message": "Category name is null",
-	// 	})
-	// }
 	if err := c.Bind(&addCategoryRequest); err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Server error",
